@@ -8,3 +8,5 @@ from .arg import OPT
 from .arg import check_required
 from .arg import remove_optional
 from .arg import prepare_kwargs
+from .dataclass import BaseModel
+from .dataclass import BaseFrozenModel

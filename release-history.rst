@@ -29,11 +29,14 @@ Backlog (TODO)
 - Add the following Public APIs.
     - ``func_args.api.T_KWARGS``
     - ``func_args.api.T_OPT_KWARGS``
+    - ``func_args.api.ParamError``
     - ``func_args.api.REQ``
     - ``func_args.api.OPT``
     - ``func_args.api.check_required``
     - ``func_args.api.remove_optional``
     - ``func_args.api.prepare_kwargs``
+    - ``func_args.api.BaseModel``
+    - ``func_args.api.BaseFrozenModel``
 - Upgrade the underlying ``sentinel`` package to ``1.0.0``.
 
 

@@ -51,14 +51,14 @@ Welcome to ``func_args`` Documentation
 
 Overview
 ------------------------------------------------------------------------------
-`func_args` is a lightweight Python library for creating wrapper functions with enhanced argument handling. It solves common problems when working with third-party APIs that have suboptimal interface designs.
+``func_args`` is a lightweight Python library for creating wrapper functions with enhanced argument handling. It solves common problems when working with third-party APIs that have suboptimal interface designs.
 
 The library provides sentinel values (``REQ`` and ``OPT``) that can be used as function parameter defaults to:
 
 - Mark parameters as required
 - Mark parameters as optional and easily exclude them from kwargs
 
-Additionally, ``func_args`` includes dataclass enhancements for parameter validation and conversion.
+Additionally, ``func_args`` includes `dataclasses <https://docs.python.org/3/library/dataclasses.html>`_ enhancements for parameter validation and conversion.
 
 
 Design Philosophy

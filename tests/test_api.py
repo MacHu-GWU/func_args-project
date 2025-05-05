@@ -13,6 +13,8 @@ def test():
     _ = api.check_required
     _ = api.remove_optional
     _ = api.prepare_kwargs
+    _ = api.BaseModel
+    _ = api.BaseFrozenModel
 
 
 if __name__ == "__main__":
