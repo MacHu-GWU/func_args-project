@@ -2,12 +2,12 @@
 # for more info: https://coverage.readthedocs.io/en/latest/config.html
 [run]
 omit =
-    func_args/_version.py
-    func_args/cli.py
-    func_args/pkg/*
     func_args/docs/*
     func_args/tests/*
-    func_args/handlers/*
+    func_args/vendor/*
+    func_args/_version.py
+    func_args/cli.py
+    func_args/paths.py
 
 [report]
 # Regexes for lines to exclude from consideration

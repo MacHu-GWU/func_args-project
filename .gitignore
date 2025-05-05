@@ -1,9 +1,7 @@
 # User Settings
-func_args_venv/
 func_args.egg-info/
-func_args-*/
+docs/source/**/index.md
 tmp/
-
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
