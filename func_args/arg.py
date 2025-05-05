@@ -52,6 +52,7 @@ Example::
 
 from .vendor import sentinel
 from .type_hint import T_KWARGS
+from .exc import ParamError
 
 REQ = sentinel.create(name="REQ")
 OPT = sentinel.create(name="OPT")
@@ -81,7 +82,7 @@ def check_required(**kwargs):
     """
     for key, value in kwargs.items():
         if value is REQ:
-            raise ValueError(f"Missing required argument: {key!r}")
+            raise ParamError(f"Missing required argument: {key!r}")
 
 
 def remove_optional(**kwargs) -> T_KWARGS:
@@ -117,7 +118,7 @@ def prepare_kwargs(**kwargs) -> T_KWARGS:
     new_kwargs = {}
     for key, value in kwargs.items():
         if value is REQ:
-            raise ValueError(f"Missing required argument: {key!r}")
+            raise ParamError(f"Missing required argument: {key!r}")
         elif value is OPT:
             pass
         else:

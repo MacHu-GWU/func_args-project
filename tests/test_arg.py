@@ -2,6 +2,7 @@
 
 import pytest
 
+from func_args.exc import ParamError
 from func_args.arg import REQ, OPT, check_required, remove_optional, prepare_kwargs
 
 
@@ -42,10 +43,10 @@ class TestCheckRequired:
 
     def test_with_required_args(self):
         """Should raise ValueError when REQ values are present."""
-        with pytest.raises(ValueError, match="Missing required argument: 'b'"):
+        with pytest.raises(ParamError, match="Missing required argument: 'b'"):
             check_required(**{"a": 1, "b": REQ})
 
-        with pytest.raises(ValueError, match="Missing required argument: 'missing'"):
+        with pytest.raises(ParamError, match="Missing required argument: 'missing'"):
             check_required(**{"present": "value", "missing": REQ})
 
 
@@ -84,14 +85,14 @@ class TestPrepareKwargs:
         assert result == {"a": 1, "c": "test"}
 
     def test_required_args(self):
-        """Should raise ValueError for REQ values."""
-        with pytest.raises(ValueError, match="Missing required argument: 'b'"):
+        """Should raise ParamError for REQ values."""
+        with pytest.raises(ParamError, match="Missing required argument: 'b'"):
             prepare_kwargs(**{"a": 1, "b": REQ, "c": "test"})
 
     def test_mixed_args(self):
         """Should handle mix of normal, OPT and REQ values."""
         # Should remove OPT but fail on REQ
-        with pytest.raises(ValueError, match="Missing required argument: 'c'"):
+        with pytest.raises(ParamError, match="Missing required argument: 'c'"):
             prepare_kwargs(**{"a": 1, "b": OPT, "c": REQ, "d": None})
 
         # Should handle OPT correctly when no REQ present
@@ -163,7 +164,7 @@ class TestComplexUsage:
         }
 
         # Test with missing required arg
-        with pytest.raises(ValueError, match="Missing required argument: 'body'"):
+        with pytest.raises(ParamError, match="Missing required argument: 'body'"):
             enhanced_api(bucket="my-bucket", key="file.txt")
 
 

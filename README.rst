@@ -127,7 +127,7 @@ In this example, we create a wrapper around an AWS S3 `put_object <https://boto3
         )
 
         # This will:
-        # 1. Raise ValueError if any REQ values remain
+        # 1. Raise ParamError if any REQ values remain
         # 2. Remove any OPT values
         # 3. Return a clean dict with only provided values
         cleaned_kwargs = prepare_kwargs(kwargs)
@@ -153,10 +153,10 @@ Required Parameter Validation
     # This works
     user = create_user(username="alice", email="alice@example.com")
 
-    # This raises ValueError: "Missing required argument: 'email'"
+    # This raises ParamError: "Missing required argument: 'email'"
     try:
         user = create_user(username="bob")
-    except ValueError as e:
+    except ParamError as e:
         print(e)
 
 
@@ -221,9 +221,11 @@ Enhanced Dataclasses
 
     # Convert to dict with all fields (including OPT sentinel values)
     full_dict = params.to_dict()
+    # {"username": "alice", "email": "alice@example.com", "display_name": OPT, "role": "user", "tags": []}
 
     # Convert to dict with only provided values (excluding OPT sentinels)
     kwargs = params.to_kwargs()
+    # {"username": "alice", "email": "alice@example.com", "role": "user", "tags": []}
 
 
 .. _install:

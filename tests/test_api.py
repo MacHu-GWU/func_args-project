@@ -7,6 +7,7 @@ def test():
     _ = api
     _ = api.T_KWARGS
     _ = api.T_OPT_KWARGS
+    _ = api.ParamError
     _ = api.REQ
     _ = api.OPT
     _ = api.check_required
