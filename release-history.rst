@@ -15,6 +15,28 @@ Backlog (TODO)
 **Miscellaneous**
 
 
+1.0.0 (2025-05-05)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**💥Breaking Changes**
+
+- Public API are moved away from ``func_args`` to ``func_args.api`` name space.
+- All public API in ``func_args<1.0.0`` is removed.
+- ``NOTHING`` is replaced by ``func_args.api.OPT``.
+- ``resolve_kwargs`` is replaced by ``func_args.api.remove_optional``.
+
+**Features and Improvements**
+
+- Add the following Public APIs.
+    - ``func_args.api.T_KWARGS``
+    - ``func_args.api.T_OPT_KWARGS``
+    - ``func_args.api.REQ``
+    - ``func_args.api.OPT``
+    - ``func_args.api.check_required``
+    - ``func_args.api.remove_optional``
+    - ``func_args.api.prepare_kwargs``
+- Upgrade the underlying ``sentinel`` package to ``1.0.0``.
+
+
 0.1.1 (2023-02-16)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 **Features and Improvements**
