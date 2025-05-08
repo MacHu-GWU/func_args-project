@@ -15,6 +15,15 @@ Backlog (TODO)
 **Miscellaneous**
 
 
+1.0.1 (2025-05-06)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**Bugfixes**
+
+- Add the old ``NOTHING`` API in ``>=0.1.1,<1.0.0`` back as an alias of ``OPT``.
+- Add the old ``resolve_kwargs`` API in ``>=0.1.1,<1.0.0`` back as an alias of ``remove_optional``.
+- YANK 1.0.0.
+
+
 1.0.0 (2025-05-05)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 **💥Breaking Changes**
