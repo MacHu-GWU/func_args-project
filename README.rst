@@ -1,5 +1,5 @@
 
-.. .. image:: https://readthedocs.org/projects/func-args/badge/?version=latest
+.. image:: https://readthedocs.org/projects/func-args/badge/?version=latest
     :target: https://func-args.readthedocs.io/en/latest/
     :alt: Documentation Status
 
@@ -26,7 +26,7 @@
 
 ------
 
-.. .. image:: https://img.shields.io/badge/Link-API-blue.svg
+.. image:: https://img.shields.io/badge/Link-API-blue.svg
     :target: https://func-args.readthedocs.io/en/latest/py-modindex.html
 
 .. image:: https://img.shields.io/badge/Link-Install-blue.svg
@@ -47,6 +47,8 @@
 
 Welcome to ``func_args`` Documentation
 ==============================================================================
+.. image:: https://func-args.readthedocs.io/en/latest/_static/func_args-logo.png
+    :target: https://func-args.readthedocs.io/en/latest/
 
 
 Overview

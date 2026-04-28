@@ -1,6 +1,7 @@
 # User Settings
 func_args.egg-info/
 docs/source/**/index.md
+.claude/claude-code-message*
 tmp/
 
 # Byte-compiled / optimized / DLL files
