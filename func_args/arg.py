@@ -32,9 +32,9 @@ Example::
         Tags: T.Optional[dict[str, str]] = OPT,
     ):
         # custom parameter handling
-        if Metadata is NA:
+        if Metadata is OPT:
             Metadata = {"creator": "admin"}
-        if Tags is NA:
+        if Tags is OPT:
             Tags = {"creator": "admin"}
 
         # Prepare kwargs with validation
@@ -45,7 +45,7 @@ Example::
             Metadata=Metadata,
             Tags=Tags,
         )
-        cleaned_kwargs = prepare_kwargs(kwargs)
+        cleaned_kwargs = prepare_kwargs(**kwargs)
         return put_object(**cleaned_kwargs)
 
 """
@@ -58,7 +58,7 @@ REQ = sentinel.create(name="REQ")
 OPT = sentinel.create(name="OPT")
 
 
-def check_required(**kwargs):
+def check_required(**kwargs) -> None:
     """
     Check and validate required arguments in kwargs.
 
@@ -92,7 +92,7 @@ def remove_optional(**kwargs) -> T_KWARGS:
     Filters out any keyword arguments that have the value OPT,
     returning a new dictionary with only the non-OPT values.
     """
-    return {key: value for key, value in kwargs.items() if (value is OPT) is False}
+    return {key: value for key, value in kwargs.items() if value is not OPT}
 
 
 def prepare_kwargs(**kwargs) -> T_KWARGS:
@@ -104,16 +104,16 @@ def prepare_kwargs(**kwargs) -> T_KWARGS:
 
     Examples:
 
-    >>> prepare_kwargs({'name': 'test', 'id': 123})
+    >>> prepare_kwargs(name='test', id=123)
     {'name': 'test', 'id': 123}
 
-    >>> prepare_kwargs({'name': 'test', 'extra': OPT})
+    >>> prepare_kwargs(name='test', extra=OPT)
     {'name': 'test'}
 
-    >>> prepare_kwargs({'name': 'test', 'id': REQ})
+    >>> prepare_kwargs(name='test', id=REQ)
     Traceback (most recent call last):
         ...
-    ValueError: Missing required argument: 'id'
+    ParamError: Missing required argument: 'id'
     """
     new_kwargs = {}
     for key, value in kwargs.items():

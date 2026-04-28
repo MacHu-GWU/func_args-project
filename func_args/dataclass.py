@@ -14,11 +14,10 @@ Key features:
 - Freedom from dataclass limitations on field ordering (required fields first)
 """
 
-import typing as T
 import dataclasses
 
 from .exc import ParamError
-from .arg import REQ, OPT, remove_optional, T_KWARGS
+from .arg import REQ, OPT, T_KWARGS
 
 
 class BaseModelMixin:
@@ -31,21 +30,21 @@ class BaseModelMixin:
     dictionaries suitable for function calls.
     """
 
-    def _validate(self):
+    def _validate(self) -> None:
         """
         Validate that all required parameters are provided.
         """
         for field in dataclasses.fields(self.__class__):
             if field.init:
                 k = field.name
-                if getattr(self, k) is REQ:  # pragma: no cover
+                if getattr(self, k) is REQ:
                     raise ParamError(f"Field {k!r} is required for {self.__class__}.")
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self._validate()
 
     @classmethod
-    def _split_req_opt(cls, kwargs: T_KWARGS) -> T.Tuple[T_KWARGS, T_KWARGS]:
+    def _split_req_opt(cls, kwargs: T_KWARGS) -> tuple[T_KWARGS, T_KWARGS]:
         """
         Split provided kwargs into required and optional parameters.
         """
@@ -54,16 +53,16 @@ class BaseModelMixin:
             if field.default is REQ:
                 try:
                     req_kwargs[field.name] = kwargs[field.name]
-                except KeyError:  # pragma: no cover
+                except KeyError:
                     raise ParamError(
                         f"{field.name!r} is a required parameter for {cls}!"
                     )
             else:
                 try:
                     opt_kwargs[field.name] = kwargs[field.name]
-                except KeyError:  # pragma: no cover
+                except KeyError:
                     pass
-        opt_kwargs = remove_optional(**opt_kwargs)
+        opt_kwargs = {k: v for k, v in opt_kwargs.items() if v is not OPT}
         return req_kwargs, opt_kwargs
 
     def to_dict(self) -> T_KWARGS:
@@ -76,7 +75,7 @@ class BaseModelMixin:
         """
         Convert the dataclass to a dictionary suitable for function calls.
         """
-        return remove_optional(**self.to_dict())
+        return {k: v for k, v in dataclasses.asdict(self).items() if v is not OPT}
 
 
 @dataclasses.dataclass
