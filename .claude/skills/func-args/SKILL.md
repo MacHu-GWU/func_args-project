@@ -1,7 +1,6 @@
 ---
 name: func-args
 description: Guide for using the func_args Python library (>=1.0.2) — sentinel-based function argument handling with REQ/OPT markers and enhanced dataclasses. Use when writing API wrappers, parameter validation, or dataclass-based config objects.
-user-invocable: false
 ---
 
 # func_args Library Usage Guide
