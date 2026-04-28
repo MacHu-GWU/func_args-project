@@ -542,7 +542,7 @@ wheels = [
 
 [[package]]
 name = "func-args"
-version = "1.0.1"
+version = "1.0.2"
 source = { editable = "." }
 
 [package.optional-dependencies]

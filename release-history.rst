@@ -17,6 +17,28 @@ Backlog (TODO)
 - Deprecate ``NOTHING``, ``resolve_kwargs`` in ``2.X``
 
 
+1.0.2 (2026-04-28)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**Minor Improvements**
+
+- Modernize type hints for Python 3.10+: use ``dict[str, Any]``, ``tuple[...]``, and ``X | None`` instead of ``typing.Dict``, ``typing.Tuple``, ``typing.Optional``.
+- Add return type annotations to ``check_required``, ``_validate``, and ``__post_init__``.
+- Improve ``to_kwargs()`` and ``_split_req_opt()`` efficiency by using inline dict comprehension instead of routing through ``remove_optional(**...)``.
+- Use idiomatic ``value is not OPT`` instead of ``(value is OPT) is False`` in ``remove_optional()``.
+
+**Bugfixes**
+
+- Fix incorrect sentinel name ``NA`` in module docstring (should be ``OPT``).
+- Fix docstring examples showing ``prepare_kwargs(dict)`` instead of correct ``prepare_kwargs(**dict)`` syntax.
+- Fix doctest showing ``ValueError`` instead of ``ParamError`` in ``prepare_kwargs`` docstring.
+- Remove incorrect ``# pragma: no cover`` annotations on code paths that are actually covered by tests.
+
+**Miscellaneous**
+
+- Migrate project tooling from Poetry/Makefile to uv/mise.
+- Update README with comprehensive usage examples and API reference table.
+
+
 1.0.1 (2025-05-06)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 **Bugfixes**

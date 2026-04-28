@@ -53,181 +53,14 @@ Welcome to ``func_args`` Documentation
 
 Overview
 ------------------------------------------------------------------------------
-``func_args`` is a lightweight Python library for creating wrapper functions with enhanced argument handling. It solves common problems when working with third-party APIs that have suboptimal interface designs.
+``func_args`` is a lightweight, zero-dependency Python library that provides sentinel values (``REQ`` and ``OPT``) for enhanced function argument handling. It solves common problems when creating wrapper functions around third-party APIs.
 
-The library provides sentinel values (``REQ`` and ``OPT``) that can be used as function parameter defaults to:
+**Key features:**
 
-- Mark parameters as required
-- Mark parameters as optional and easily exclude them from kwargs
-
-Additionally, ``func_args`` includes `dataclasses <https://docs.python.org/3/library/dataclasses.html>`_ enhancements for parameter validation and conversion.
-
-
-Design Philosophy
-------------------------------------------------------------------------------
-``func_args`` follows these core principles:
-
-1. **Explicit over implicit** - Parameters are clearly marked as required or optional
-2. **Fail fast** - Required parameters are validated early
-3. **Minimal overhead** - Simple API with minimal processing cost
-4. **Flexible integration** - Works with any Python function without modifying the original
-5. **Type hint support** - Full support for Python type annotations
-6. **Consistent error handling** - Clear error messages for missing required parameters
-
-The library solves several common problems:
-
-- Creating wrapper functions around third-party APIs with poor parameter interfaces
-- Building flexible functions with many optional parameters
-- Enforcing required parameters without complex conditional logic
-- Removing optional parameters from kwargs dictionaries to avoid passing unused parameters
-
-
-Usage Examples
-------------------------------------------------------------------------------
-
-
-Basic Sentinels
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-In this example, we create a wrapper around an AWS S3 `put_object <https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/put_object.html>`_ API:
-
-.. code-block:: python
-
-    def put_object(
-        Bucket: str,
-        Key: str,
-        Body: bytes,
-        Metadata: T.Optional[dict[str, str]] = ...,
-        Tags: T.Optional[dict[str, str]] = ...,
-    ):
-        ...
-
-.. code-block:: python
-
-    from func_args.api import REQ, OPT, prepare_kwargs
-
-    # Our enhanced wrapper with REQ and OPT
-    def better_put_object(
-        Bucket: str = REQ,
-        Key: str = REQ,
-        Body: bytes = REQ,
-        Metadata: T.Optional[dict[str, str]] = OPT,
-        Tags: T.Optional[dict[str, str]] = OPT,
-    ):
-        # custom parameter handling
-        if Metadata is NA:
-            Metadata = {"creator": "admin"}
-        if Tags is NA:
-            Tags = {"creator": "admin"}
-
-        # Prepare kwargs with validation
-        kwargs = dict(
-            Bucket=Bucket,
-            Key=Key,
-            Body=Body,
-            Metadata=Metadata,
-            Tags=Tags,
-        )
-
-        # This will:
-        # 1. Raise ParamError if any REQ values remain
-        # 2. Remove any OPT values
-        # 3. Return a clean dict with only provided values
-        cleaned_kwargs = prepare_kwargs(kwargs)
-
-        # Call the original API with only the necessary parameters
-        return put_object(**cleaned_kwargs)
-
-
-Required Parameter Validation
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.. code-block:: python
-
-    from func_args.arg import REQ, check_required
-
-    # Function with required parameters
-    def create_user(username=REQ, email=REQ, role="user"):
-        # Validate required parameters
-        check_required(username=username, email=email)
-
-        # If we got here, all required parameters were provided
-        return {"username": username, "email": email, "role": role}
-
-    # This works
-    user = create_user(username="alice", email="alice@example.com")
-
-    # This raises ParamError: "Missing required argument: 'email'"
-    try:
-        user = create_user(username="bob")
-    except ParamError as e:
-        print(e)
-
-
-Optional Parameter Removal
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.. code-block:: python
-
-    from func_args.arg import OPT, remove_optional
-
-    # Function with many optional parameters
-    def search_items(query, limit=10, offset=0, sort_by=OPT, filter_by=OPT, include_deleted=False):
-        # Build base query parameters
-        params = {
-            "query": query,
-            "limit": limit,
-            "offset": offset,
-            "sort_by": sort_by,
-            "filter_by": filter_by,
-            "include_deleted": include_deleted,
-        }
-
-        # Remove optional parameters that weren't provided
-        clean_params = remove_optional(**params)
-
-        # Now we can safely pass to the API without sending None values or defaults
-        return api_search(**clean_params)
-
-
-Enhanced Dataclasses
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.. code-block:: python
-
-    import dataclasses
-    from func_args.dataclass import BaseModel, REQ, OPT
-
-    @dataclasses.dataclass
-    class UserParameters(BaseModel):
-        """Parameter class for user operations with validation."""
-
-        # Required fields
-        username: str = dataclasses.field(default=REQ)
-        email: str = dataclasses.field(default=REQ)
-
-        # Optional fields
-        display_name: str = dataclasses.field(default=OPT)
-        role: str = dataclasses.field(default="user")
-        tags: list = dataclasses.field(default_factory=list)
-
-        def validate_email(self):
-            """Additional validation logic."""
-            if not "@" in self.email:
-                raise ValueError("Invalid email format")
-
-        def __post_init__(self):
-            # Call the base class validation
-            super().__post_init__()
-            # Perform additional validation
-            self.validate_email()
-
-    # Usage
-    params = UserParameters(username="alice", email="alice@example.com")
-
-    # Convert to dict with all fields (including OPT sentinel values)
-    full_dict = params.to_dict()
-    # {"username": "alice", "email": "alice@example.com", "display_name": OPT, "role": "user", "tags": []}
-
-    # Convert to dict with only provided values (excluding OPT sentinels)
-    kwargs = params.to_kwargs()
-    # {"username": "alice", "email": "alice@example.com", "role": "user", "tags": []}
+- ``REQ`` sentinel — marks parameters as required, with early validation
+- ``OPT`` sentinel — marks parameters as optional, automatically excluded from kwargs
+- ``prepare_kwargs()`` — validates required and removes optional in one pass
+- ``BaseModel`` / ``BaseFrozenModel`` — dataclass mixins that bypass the "default after non-default" ordering limitation
 
 
 .. _install:
@@ -235,14 +68,175 @@ Enhanced Dataclasses
 Install
 ------------------------------------------------------------------------------
 
-``func_args`` is released on PyPI, so all you need is to:
-
 .. code-block:: console
 
     $ pip install func-args
 
-To upgrade to latest version:
 
-.. code-block:: console
+Usage
+------------------------------------------------------------------------------
 
-    $ pip install --upgrade func-args
+
+1. Wrapping Third-Party APIs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The most common use case: creating a better interface around an existing API.
+
+.. code-block:: python
+
+    from func_args.api import REQ, OPT, prepare_kwargs
+
+    # Suppose this is a third-party API you cannot modify:
+    def put_object(Bucket, Key, Body, Metadata=None, Tags=None):
+        """AWS S3 put_object simplified."""
+        ...
+
+    # Your enhanced wrapper:
+    def better_put_object(
+        Bucket: str = REQ,
+        Key: str = REQ,
+        Body: bytes = REQ,
+        Metadata: dict | None = OPT,
+        Tags: dict | None = OPT,
+    ):
+        # You can add custom logic for optional params
+        if Metadata is OPT:
+            Metadata = {"creator": "admin"}
+
+        kwargs = dict(
+            Bucket=Bucket,
+            Key=Key,
+            Body=Body,
+            Metadata=Metadata,
+            Tags=Tags,
+        )
+        # prepare_kwargs will:
+        # 1. Raise ParamError if any value is still REQ (caller forgot it)
+        # 2. Remove any value that is still OPT (caller didn't provide it)
+        # 3. Return a clean dict ready for the real API call
+        return put_object(**prepare_kwargs(**kwargs))
+
+    # Works - Tags is OPT so it gets removed automatically
+    better_put_object(Bucket="my-bucket", Key="file.txt", Body=b"hello")
+
+    # Raises ParamError: "Missing required argument: 'Body'"
+    better_put_object(Bucket="my-bucket", Key="file.txt")
+
+
+2. Individual Utilities
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+You can also use ``check_required`` and ``remove_optional`` separately:
+
+.. code-block:: python
+
+    from func_args.api import REQ, OPT, check_required, remove_optional
+
+    def create_user(username=REQ, email=REQ, nickname=OPT, role="user"):
+        # Step 1: validate required params
+        check_required(username=username, email=email)
+
+        # Step 2: build kwargs and remove OPT values
+        kwargs = remove_optional(
+            username=username,
+            email=email,
+            nickname=nickname,
+            role=role,
+        )
+        return kwargs
+
+    create_user(username="alice", email="alice@example.com")
+    # -> {"username": "alice", "email": "alice@example.com", "role": "user"}
+
+    create_user(username="bob", email="bob@example.com", nickname="Bobby")
+    # -> {"username": "bob", "email": "bob@example.com", "nickname": "Bobby", "role": "user"}
+
+
+3. Enhanced Dataclasses
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``BaseModel`` and ``BaseFrozenModel`` let you define dataclasses with ``REQ``/``OPT``
+defaults in **any order** — no more "fields without defaults must come before fields
+with defaults" restriction.
+
+.. code-block:: python
+
+    import dataclasses
+    from func_args.api import BaseModel, BaseFrozenModel, REQ, OPT
+
+    @dataclasses.dataclass
+    class DeployConfig(BaseModel):
+        """
+        Note: OPT fields can appear BEFORE REQ fields.
+        Standard dataclasses would reject this ordering.
+        """
+        region: str = dataclasses.field(default=OPT)      # optional, listed first
+        env: str = dataclasses.field(default="prod")       # has default
+        app_name: str = dataclasses.field(default=REQ)     # required, listed last
+        tags: list = dataclasses.field(default_factory=list)
+
+    # REQ fields must be provided, OPT fields are truly optional
+    config = DeployConfig(app_name="my-service")
+    assert config.app_name == "my-service"
+    assert config.region is OPT
+    assert config.env == "prod"
+
+    # to_dict() returns all fields including sentinel values
+    config.to_dict()
+    # {"region": OPT, "env": "prod", "app_name": "my-service", "tags": []}
+
+    # to_kwargs() returns only provided values (OPT filtered out)
+    config.to_kwargs()
+    # {"env": "prod", "app_name": "my-service", "tags": []}
+
+    # Missing required field raises ParamError immediately
+    DeployConfig()  # raises ParamError: "Field 'app_name' is required ..."
+
+
+4. Frozen Dataclass with Computed Fields
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: python
+
+    @dataclasses.dataclass(frozen=True)
+    class Document(BaseFrozenModel):
+        title: str = dataclasses.field(default=REQ)
+        author: str = dataclasses.field(default=OPT)
+        version: int = dataclasses.field(default=1)
+
+        # Computed fields (init=False) work seamlessly
+        slug: str = dataclasses.field(init=False)
+
+        def __post_init__(self):
+            super().__post_init__()  # validates REQ fields first
+            object.__setattr__(self, "slug", self.title.lower().replace(" ", "-"))
+
+    doc = Document(title="API Guide")
+    assert doc.slug == "api-guide"
+    assert doc.to_kwargs() == {"title": "API Guide", "version": 1, "slug": "api-guide"}
+    # "author" excluded because it's still OPT
+
+
+API Reference
+------------------------------------------------------------------------------
+
++---------------------------+-----------------------------------------------------------+
+| Symbol                    | Description                                               |
++===========================+===========================================================+
+| ``REQ``                   | Sentinel marking a required parameter                     |
++---------------------------+-----------------------------------------------------------+
+| ``OPT``                   | Sentinel marking an optional parameter                    |
++---------------------------+-----------------------------------------------------------+
+| ``check_required(**kw)``  | Raises ``ParamError`` if any value is ``REQ``             |
++---------------------------+-----------------------------------------------------------+
+| ``remove_optional(**kw)`` | Returns new dict with ``OPT`` values removed              |
++---------------------------+-----------------------------------------------------------+
+| ``prepare_kwargs(**kw)``  | Combines check_required + remove_optional in one pass     |
++---------------------------+-----------------------------------------------------------+
+| ``BaseModel``             | Mutable dataclass mixin with REQ/OPT support              |
++---------------------------+-----------------------------------------------------------+
+| ``BaseFrozenModel``       | Frozen (immutable) dataclass mixin with REQ/OPT support   |
++---------------------------+-----------------------------------------------------------+
+| ``ParamError``            | Exception raised for missing required parameters          |
++---------------------------+-----------------------------------------------------------+
+
+
+AI Agent Skill
+------------------------------------------------------------------------------
+This project ships a self-contained `Agent skill <https://code.claude.com/docs/skills>`_ at ``.claude/skills/func-args/SKILL.md``. Copy this file into your project's ``.claude/skills/`` directory and your AI coding agent will know how to use ``func_args`` correctly — including API usage patterns, dataclass examples, and common pitfalls.
